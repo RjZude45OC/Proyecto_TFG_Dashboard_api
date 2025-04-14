@@ -47,12 +47,30 @@ public class SystemMonitorService {
             Thread.currentThread().interrupt();
         }
         CpuMetrics cpuMetrics = new CpuMetrics();
-        cpuMetrics.setSystemCpuLoad(processor.getSystemCpuLoad(prevTicks) * 100);
+        long[] prevTicksPerc = processor.getSystemCpuLoadTicks();
+        try {
+            Thread.sleep(500);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+        long[] currTicksPerc = processor.getSystemCpuLoadTicks();
+        double systemCpuLoad = processor.getSystemCpuLoadBetweenTicks(prevTicksPerc) * 100;
+        cpuMetrics.setSystemCpuLoad(systemCpuLoad);
+
         cpuMetrics.setAvailableProcessors(processor.getLogicalProcessorCount());
-        cpuMetrics.setSystemLoadAverage(processor.getSystemLoadAverage());
+
+        double[] loadAverage = processor.getSystemLoadAverage(1);
+        cpuMetrics.setSystemLoadAverage(loadAverage[0]);
 
         // Get per-processor load
-        double[] loadPerProcessor = processor.getProcessorCpuLoadBetweenTicks(prevTicks);
+        long[][] prevProcTicks = processor.getProcessorCpuLoadTicks();
+        try {
+            Thread.sleep(500); // Only sleep once if this is in sequence with the above code
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+        long[][] currProcTicks = processor.getProcessorCpuLoadTicks();
+        double[] loadPerProcessor = processor.getProcessorCpuLoadBetweenTicks(prevProcTicks);
         List<Double> perProcessorLoad = new ArrayList<>();
         for (double load : loadPerProcessor) {
             perProcessorLoad.add(load * 100);
