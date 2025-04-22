@@ -20,10 +20,6 @@ public class scheduler {
     private static final Logger log = LoggerFactory.getLogger(scheduler.class);
     private final SystemMonitorService systemMonitorService;
 
-    public scheduler(SystemMonitorService systemMonitorService) {
-        this.systemMonitorService = systemMonitorService;
-    }
-
     @Scheduled(fixedRateString = "${metrics.scheduler.interval:60000}")
     public void logSystemMetrics() {
         if (log.isInfoEnabled()) {
