@@ -17,12 +17,11 @@ import java.util.Map;
 @Service
 @Slf4j
 public class SystemMonitorService {
-    private final SystemInfo systemInfo;
     private final HardwareAbstractionLayer hardware;
     private final OperatingSystem os;
 
     public SystemMonitorService() {
-        this.systemInfo = new SystemInfo();
+        SystemInfo systemInfo = new SystemInfo();
         this.hardware = systemInfo.getHardware();
         this.os = systemInfo.getOperatingSystem();
     }
@@ -128,20 +127,25 @@ public class SystemMonitorService {
             // Refresh to get current values
             networkIF.updateAttributes();
 
-            NetworkInterfaceMetrics interfaceMetrics = new NetworkInterfaceMetrics();
-            interfaceMetrics.setName(networkIF.getName());
-            interfaceMetrics.setDisplayName(networkIF.getDisplayName());
-            interfaceMetrics.setBytesReceived(networkIF.getBytesRecv());
-            interfaceMetrics.setBytesSent(networkIF.getBytesSent());
-            interfaceMetrics.setPacketsReceived(networkIF.getPacketsRecv());
-            interfaceMetrics.setPacketsSent(networkIF.getPacketsSent());
-            interfaceMetrics.setInErrors(networkIF.getInErrors());
-            interfaceMetrics.setOutErrors(networkIF.getOutErrors());
+            NetworkInterfaceMetrics interfaceMetrics = getNetworkInterfaceMetrics(networkIF);
 
             interfaceMetricsMap.put(networkIF.getName(), interfaceMetrics);
         }
 
         networkMetrics.setInterfaces(interfaceMetricsMap);
         return networkMetrics;
+    }
+
+    private static NetworkInterfaceMetrics getNetworkInterfaceMetrics(NetworkIF networkIF) {
+        NetworkInterfaceMetrics interfaceMetrics = new NetworkInterfaceMetrics();
+        interfaceMetrics.setName(networkIF.getName());
+        interfaceMetrics.setDisplayName(networkIF.getDisplayName());
+        interfaceMetrics.setBytesReceived(networkIF.getBytesRecv());
+        interfaceMetrics.setBytesSent(networkIF.getBytesSent());
+        interfaceMetrics.setPacketsReceived(networkIF.getPacketsRecv());
+        interfaceMetrics.setPacketsSent(networkIF.getPacketsSent());
+        interfaceMetrics.setInErrors(networkIF.getInErrors());
+        interfaceMetrics.setOutErrors(networkIF.getOutErrors());
+        return interfaceMetrics;
     }
 }
