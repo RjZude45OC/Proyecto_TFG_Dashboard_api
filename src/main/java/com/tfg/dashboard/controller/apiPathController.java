@@ -19,6 +19,10 @@ import java.util.List;
 public class apiPathController {
     private final SystemMonitorService systemMonitorService;
 
+    public apiPathController(SystemMonitorService systemMonitorService) {
+        this.systemMonitorService = systemMonitorService;
+    }
+
     @GetMapping
     @Operation(summary = "Get all system metrics", description = "Returns complete system metrics including CPU, memory, disk, and network")
     public ResponseEntity<SystemMetrics> getAllMetrics() {
