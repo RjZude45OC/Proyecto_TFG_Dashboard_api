@@ -12,4 +12,35 @@ public class NetworkInterfaceMetrics {
     private long packetsSent;
     private long inErrors;
     private long outErrors;
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setDisplayName(String displayName) {
+        this.displayName = displayName;
+    }
+
+    public void setBytesReceived(long bytesRecv) {
+        this.bytesReceived = bytesRecv;
+    }
+    public void setPacketsSent(long packetsSent) {
+        this.packetsSent = packetsSent;
+    }
+
+    public void setInErrors(long inErrors) {
+        this.inErrors = inErrors;
+    }
+
+    public void setOutErrors(long outErrors) {
+        this.outErrors = outErrors;
+    }
+
+    public void setBytesSent(long bytesSent) {
+        this.bytesSent = bytesSent;
+    }
+
+    public void setPacketsReceived(long packetsReceived) {
+        this.packetsReceived = packetsReceived;
+    }
 }

@@ -10,4 +10,28 @@ public class DiskMetrics {
     private long usableSpace;
     private long usedSpace;
     private double usagePercentage;
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setMountPoint(String mountPoint) {
+        this.mountPoint = mountPoint;
+    }
+
+    public void setTotalSpace(long totalSpace) {
+        this.totalSpace = totalSpace;
+    }
+
+    public void setUsableSpace(long usableSpace) {
+        this.usableSpace = usableSpace;
+    }
+
+    public void setUsedSpace(long usedSpace) {
+        this.usedSpace = usedSpace;
+    }
+
+    public void setUsagePercentage(double usagePercentage) {
+        this.usagePercentage = usagePercentage;
+    }
 }

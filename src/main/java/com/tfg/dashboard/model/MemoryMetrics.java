@@ -8,4 +8,20 @@ public class MemoryMetrics {
     private long availableMemory;
     private long usedMemory;
     private double memoryUsagePercentage;
+
+    public void setTotalMemory(long totalMemory) {
+        this.totalMemory = totalMemory;
+    }
+
+    public void setAvailableMemory(long availableMemory) {
+        this.availableMemory = availableMemory;
+    }
+
+    public void setUsedMemory(long usedMemory) {
+        this.usedMemory = usedMemory;
+    }
+
+    public void setMemoryUsagePercentage(double memoryUsagePercentage) {
+        this.memoryUsagePercentage = memoryUsagePercentage;
+    }
 }

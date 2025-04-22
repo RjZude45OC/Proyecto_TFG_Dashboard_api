@@ -6,4 +6,8 @@ import java.util.Map;
 @Data
 public class NetworkMetrics {
     private Map<String, NetworkInterfaceMetrics> interfaces;
+
+    public void setInterfaces(Map<String, NetworkInterfaceMetrics> interfaceMetricsMap) {
+        interfaces = interfaceMetricsMap;
+    }
 }
