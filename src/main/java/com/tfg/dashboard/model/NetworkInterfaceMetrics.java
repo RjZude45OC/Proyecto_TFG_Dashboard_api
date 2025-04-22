@@ -43,4 +43,36 @@ public class NetworkInterfaceMetrics {
     public void setPacketsReceived(long packetsReceived) {
         this.packetsReceived = packetsReceived;
     }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getDisplayName() {
+        return displayName;
+    }
+
+    public long getBytesReceived() {
+        return bytesReceived;
+    }
+
+    public long getBytesSent() {
+        return bytesSent;
+    }
+
+    public long getPacketsReceived() {
+        return packetsReceived;
+    }
+
+    public long getPacketsSent() {
+        return packetsSent;
+    }
+
+    public long getInErrors() {
+        return inErrors;
+    }
+
+    public long getOutErrors() {
+        return outErrors;
+    }
 }

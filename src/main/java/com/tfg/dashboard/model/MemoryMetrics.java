@@ -24,4 +24,20 @@ public class MemoryMetrics {
     public void setMemoryUsagePercentage(double memoryUsagePercentage) {
         this.memoryUsagePercentage = memoryUsagePercentage;
     }
+
+    public double getMemoryUsagePercentage() {
+        return memoryUsagePercentage;
+    }
+
+    public long getTotalMemory() {
+        return totalMemory;
+    }
+
+    public long getAvailableMemory() {
+        return availableMemory;
+    }
+
+    public long getUsedMemory() {
+        return usedMemory;
+    }
 }

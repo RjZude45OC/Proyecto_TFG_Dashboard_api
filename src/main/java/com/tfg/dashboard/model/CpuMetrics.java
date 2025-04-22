@@ -51,4 +51,5 @@ public class CpuMetrics {
     public void setSystemLoadAverage(double systemLoadAverage) {
         this.systemLoadAverage = systemLoadAverage;
     }
+
 }

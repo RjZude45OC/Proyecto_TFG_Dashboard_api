@@ -10,4 +10,8 @@ public class NetworkMetrics {
     public void setInterfaces(Map<String, NetworkInterfaceMetrics> interfaceMetricsMap) {
         interfaces = interfaceMetricsMap;
     }
+
+    public Map<String, NetworkInterfaceMetrics> getInterfaces() {
+        return interfaces;
+    }
 }
