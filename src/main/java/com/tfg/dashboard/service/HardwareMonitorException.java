@@ -17,4 +17,8 @@ public class HardwareMonitorException extends RuntimeException {
         super(message, cause);
         this.status = status;
     }
+
+    public HttpStatus getStatus() {
+        return status;
+    }
 }

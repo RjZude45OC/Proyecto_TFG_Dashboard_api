@@ -3,10 +3,12 @@ package com.tfg.dashboard.service;
 import com.tfg.dashboard.model.SystemMetrics;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
+import org.slf4j.Logger;
 
 @Configuration
 @EnableScheduling
@@ -15,7 +17,12 @@ import org.springframework.scheduling.annotation.Scheduled;
 @ConditionalOnProperty(name = "metrics.scheduler.enabled", havingValue = "true", matchIfMissing = false)
 public class scheduler {
 
+    private static final Logger log = LoggerFactory.getLogger(scheduler.class);
     private final SystemMonitorService systemMonitorService;
+
+    public scheduler(SystemMonitorService systemMonitorService) {
+        this.systemMonitorService = systemMonitorService;
+    }
 
     @Scheduled(fixedRateString = "${metrics.scheduler.interval:60000}")
     public void logSystemMetrics() {
