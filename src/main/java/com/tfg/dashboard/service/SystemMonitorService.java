@@ -38,37 +38,23 @@ public class SystemMonitorService {
     public CpuMetrics getCpuMetrics() {
         CentralProcessor processor = hardware.getProcessor();
         long[] prevTicks = processor.getSystemCpuLoadTicks();
+        long[][] prevProcTicks = processor.getProcessorCpuLoadTicks();
 
-        // Wait a bit to get a valid CPU load calculation
         try {
             Thread.sleep(500);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         }
+
+        long[] currTicks = processor.getSystemCpuLoadTicks();
+        long[][] currProcTicks = processor.getProcessorCpuLoadTicks();
+
         CpuMetrics cpuMetrics = new CpuMetrics();
-        long[] prevTicksPerc = processor.getSystemCpuLoadTicks();
-        try {
-            Thread.sleep(500);
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
-        long[] currTicksPerc = processor.getSystemCpuLoadTicks();
-        double systemCpuLoad = processor.getSystemCpuLoadBetweenTicks(prevTicksPerc) * 100;
-        cpuMetrics.setSystemCpuLoad(systemCpuLoad);
-
+        cpuMetrics.setSystemCpuLoad(processor.getSystemCpuLoadBetweenTicks(prevTicks) * 100);
         cpuMetrics.setAvailableProcessors(processor.getLogicalProcessorCount());
-
         double[] loadAverage = processor.getSystemLoadAverage(1);
         cpuMetrics.setSystemLoadAverage(loadAverage[0]);
 
-        // Get per-processor load
-        long[][] prevProcTicks = processor.getProcessorCpuLoadTicks();
-        try {
-            Thread.sleep(500); // Only sleep once if this is in sequence with the above code
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
-        long[][] currProcTicks = processor.getProcessorCpuLoadTicks();
         double[] loadPerProcessor = processor.getProcessorCpuLoadBetweenTicks(prevProcTicks);
         List<Double> perProcessorLoad = new ArrayList<>();
         for (double load : loadPerProcessor) {
