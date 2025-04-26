@@ -2,6 +2,7 @@ package com.tfg.dashboard.service;
 
 import com.tfg.dashboard.model.*;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import oshi.SystemInfo;
 import oshi.hardware.*;
@@ -9,16 +10,23 @@ import oshi.software.os.FileSystem;
 import oshi.software.os.OSFileStore;
 import oshi.software.os.OperatingSystem;
 
+import jakarta.annotation.PostConstruct;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicReference;
 
 @Service
 @Slf4j
 public class SystemMonitorService {
     private final HardwareAbstractionLayer hardware;
     private final OperatingSystem os;
+    private final AtomicReference<CpuMetrics> cachedCpuMetrics = new AtomicReference<>(new CpuMetrics());
+
+    // Keep track of previous measurements for calculation
+    private long[] prevTicks;
+    private long[][] prevProcTicks;
 
     public SystemMonitorService() {
         SystemInfo systemInfo = new SystemInfo();
@@ -26,29 +34,27 @@ public class SystemMonitorService {
         this.os = systemInfo.getOperatingSystem();
     }
 
-    public SystemMetrics getSystemMetrics() {
-        SystemMetrics metrics = new SystemMetrics();
-        metrics.setCpu(getCpuMetrics());
-        metrics.setMemory(getMemoryMetrics());
-        metrics.setDisks(getDiskMetrics());
-        metrics.setNetwork(getNetworkMetrics());
-        return metrics;
+    @PostConstruct
+    public void init() {
+        // Initialize previous values
+        CentralProcessor processor = hardware.getProcessor();
+        this.prevTicks = processor.getSystemCpuLoadTicks();
+        this.prevProcTicks = processor.getProcessorCpuLoadTicks();
+
+        // Initial update to have data available immediately
+        updateCpuMetrics();
     }
 
-    public CpuMetrics getCpuMetrics() {
+    // Run CPU metrics collection every 3 seconds in the background
+    @Scheduled(fixedRate = 3000)
+    public void updateCpuMetrics() {
         CentralProcessor processor = hardware.getProcessor();
-        long[] prevTicks = processor.getSystemCpuLoadTicks();
-        long[][] prevProcTicks = processor.getProcessorCpuLoadTicks();
 
-        try {
-            Thread.sleep(500);
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
-
+        // Get current values
         long[] currTicks = processor.getSystemCpuLoadTicks();
         long[][] currProcTicks = processor.getProcessorCpuLoadTicks();
 
+        // Calculate metrics
         CpuMetrics cpuMetrics = new CpuMetrics();
         cpuMetrics.setSystemCpuLoad(processor.getSystemCpuLoadBetweenTicks(prevTicks) * 100);
         cpuMetrics.setAvailableProcessors(processor.getLogicalProcessorCount());
@@ -61,7 +67,31 @@ public class SystemMonitorService {
             perProcessorLoad.add(load * 100);
         }
         cpuMetrics.setPerProcessorLoad(perProcessorLoad);
-        return cpuMetrics;
+
+        // Update cached metrics
+        cachedCpuMetrics.set(cpuMetrics);
+
+        // Store current values for next calculation
+        this.prevTicks = currTicks;
+        this.prevProcTicks = currProcTicks;
+
+        log.debug("Updated CPU metrics: system load {}%, processors: {}",
+                String.format("%.2f", cpuMetrics.getSystemCpuLoad()),
+                cpuMetrics.getAvailableProcessors());
+    }
+
+    public SystemMetrics getSystemMetrics() {
+        SystemMetrics metrics = new SystemMetrics();
+        metrics.setCpu(getCpuMetrics());
+        metrics.setMemory(getMemoryMetrics());
+        metrics.setDisks(getDiskMetrics());
+        metrics.setNetwork(getNetworkMetrics());
+        return metrics;
+    }
+
+    public CpuMetrics getCpuMetrics() {
+        // Return the pre-calculated metrics instead of calculating on demand
+        return cachedCpuMetrics.get();
     }
 
     public MemoryMetrics getMemoryMetrics() {
