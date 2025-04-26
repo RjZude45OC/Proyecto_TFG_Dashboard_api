@@ -5,17 +5,19 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import oshi.SystemInfo;
-import oshi.hardware.*;
+import oshi.hardware.CentralProcessor;
+import oshi.hardware.GlobalMemory;
+import oshi.hardware.HardwareAbstractionLayer;
 import oshi.software.os.FileSystem;
 import oshi.software.os.OSFileStore;
 import oshi.software.os.OperatingSystem;
 
 import jakarta.annotation.PostConstruct;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 @Service
 @Slf4j
@@ -23,6 +25,7 @@ public class SystemMonitorService {
     private final HardwareAbstractionLayer hardware;
     private final OperatingSystem os;
     private final AtomicReference<CpuMetrics> cachedCpuMetrics = new AtomicReference<>(new CpuMetrics());
+    private final Lock cpuMetricsLock = new ReentrantLock(); // Explicit lock for CPU metrics update
 
     // Keep track of previous measurements for calculation
     private long[] prevTicks;
@@ -36,25 +39,27 @@ public class SystemMonitorService {
 
     @PostConstruct
     public void init() {
-        // Initialize previous values
         CentralProcessor processor = hardware.getProcessor();
         this.prevTicks = processor.getSystemCpuLoadTicks();
         this.prevProcTicks = processor.getProcessorCpuLoadTicks();
-
-        // Initial update to have data available immediately
-        updateCpuMetrics();
+        updateCpuMetricsInternal(); // Initial update
     }
 
-    // Run CPU metrics collection every 3 seconds in the background
     @Scheduled(fixedRate = 3000)
     public void updateCpuMetrics() {
-        CentralProcessor processor = hardware.getProcessor();
+        cpuMetricsLock.lock();
+        try {
+            updateCpuMetricsInternal();
+        } finally {
+            cpuMetricsLock.unlock();
+        }
+    }
 
-        // Get current values
+    private void updateCpuMetricsInternal() {
+        CentralProcessor processor = hardware.getProcessor();
         long[] currTicks = processor.getSystemCpuLoadTicks();
         long[][] currProcTicks = processor.getProcessorCpuLoadTicks();
 
-        // Calculate metrics
         CpuMetrics cpuMetrics = new CpuMetrics();
         cpuMetrics.setSystemCpuLoad(processor.getSystemCpuLoadBetweenTicks(prevTicks) * 100);
         cpuMetrics.setAvailableProcessors(processor.getLogicalProcessorCount());
@@ -68,10 +73,7 @@ public class SystemMonitorService {
         }
         cpuMetrics.setPerProcessorLoad(perProcessorLoad);
 
-        // Update cached metrics
         cachedCpuMetrics.set(cpuMetrics);
-
-        // Store current values for next calculation
         this.prevTicks = currTicks;
         this.prevProcTicks = currProcTicks;
 
@@ -90,11 +92,11 @@ public class SystemMonitorService {
     }
 
     public CpuMetrics getCpuMetrics() {
-        // Return the pre-calculated metrics instead of calculating on demand
         return cachedCpuMetrics.get();
     }
 
     public MemoryMetrics getMemoryMetrics() {
+        // ... (rest of your MemoryMetrics code - no changes needed)
         GlobalMemory memory = hardware.getMemory();
         long total = memory.getTotal();
         long available = memory.getAvailable();
@@ -110,6 +112,7 @@ public class SystemMonitorService {
     }
 
     public List<DiskMetrics> getDiskMetrics() {
+        // ... (rest of your DiskMetrics code - no changes needed)
         List<DiskMetrics> diskMetricsList = new ArrayList<>();
         FileSystem fileSystem = os.getFileSystem();
         List<OSFileStore> fileStores = fileSystem.getFileStores();
@@ -135,16 +138,14 @@ public class SystemMonitorService {
     }
 
     public NetworkMetrics getNetworkMetrics() {
+        // ... (rest of your NetworkMetrics code - no changes needed)
         NetworkMetrics networkMetrics = new NetworkMetrics();
-        Map<String, NetworkInterfaceMetrics> interfaceMetricsMap = new HashMap<>();
+        java.util.Map<String, NetworkInterfaceMetrics> interfaceMetricsMap = new java.util.HashMap<>();
 
-        List<NetworkIF> networkIFs = hardware.getNetworkIFs();
-        for (NetworkIF networkIF : networkIFs) {
-            // Refresh to get current values
+        List<oshi.hardware.NetworkIF> networkIFs = hardware.getNetworkIFs();
+        for (oshi.hardware.NetworkIF networkIF : networkIFs) {
             networkIF.updateAttributes();
-
             NetworkInterfaceMetrics interfaceMetrics = getNetworkInterfaceMetrics(networkIF);
-
             interfaceMetricsMap.put(networkIF.getName(), interfaceMetrics);
         }
 
@@ -152,7 +153,8 @@ public class SystemMonitorService {
         return networkMetrics;
     }
 
-    private static NetworkInterfaceMetrics getNetworkInterfaceMetrics(NetworkIF networkIF) {
+    private static NetworkInterfaceMetrics getNetworkInterfaceMetrics(oshi.hardware.NetworkIF networkIF) {
+        // ... (rest of your getNetworkInterfaceMetrics code - no changes needed)
         NetworkInterfaceMetrics interfaceMetrics = new NetworkInterfaceMetrics();
         interfaceMetrics.setName(networkIF.getName());
         interfaceMetrics.setDisplayName(networkIF.getDisplayName());
