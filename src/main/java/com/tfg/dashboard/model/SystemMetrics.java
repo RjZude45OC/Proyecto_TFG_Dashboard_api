@@ -9,12 +9,14 @@ public class SystemMetrics {
     private MemoryMetrics memory;
     private List<DiskMetrics> disks;
     private NetworkMetrics network;
+    private String os;
 
-    public SystemMetrics(CpuMetrics cpu, List<DiskMetrics> disks, MemoryMetrics memory, NetworkMetrics network) {
+    public SystemMetrics(CpuMetrics cpu, List<DiskMetrics> disks, MemoryMetrics memory, NetworkMetrics network,String os) {
         this.cpu = cpu;
         this.disks = disks;
         this.memory = memory;
         this.network = network;
+        this.os = os;
     }
 
     public SystemMetrics() {
@@ -51,5 +53,8 @@ public class SystemMetrics {
     public void setNetwork(NetworkMetrics network) {
         this.network = network;
     }
+
+    public String getOs(){ return os; }
+    public void setOs(String os){ this.os = os;};
 }
 

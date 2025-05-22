@@ -17,7 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
+import java.util.concurrent.locks.ReentrantLock;import static com.tfg.dashboard.service.scheduler.log;
 
 @Service
 @Slf4j
@@ -25,9 +25,8 @@ public class SystemMonitorService {
     private final HardwareAbstractionLayer hardware;
     private final OperatingSystem os;
     private final AtomicReference<CpuMetrics> cachedCpuMetrics = new AtomicReference<>(new CpuMetrics());
-    private final Lock cpuMetricsLock = new ReentrantLock(); // Explicit lock for CPU metrics update
+    private final Lock cpuMetricsLock = new ReentrantLock();
 
-    // Keep track of previous measurements for calculation
     private long[] prevTicks;
     private long[][] prevProcTicks;
 
@@ -42,7 +41,7 @@ public class SystemMonitorService {
         CentralProcessor processor = hardware.getProcessor();
         this.prevTicks = processor.getSystemCpuLoadTicks();
         this.prevProcTicks = processor.getProcessorCpuLoadTicks();
-        updateCpuMetricsInternal(); // Initial update
+        updateCpuMetricsInternal();
     }
 
     @Scheduled(fixedRate = 3000)
@@ -88,6 +87,7 @@ public class SystemMonitorService {
         metrics.setMemory(getMemoryMetrics());
         metrics.setDisks(getDiskMetrics());
         metrics.setNetwork(getNetworkMetrics());
+        metrics.setOs(String.valueOf(os));
         return metrics;
     }
 
@@ -96,7 +96,6 @@ public class SystemMonitorService {
     }
 
     public MemoryMetrics getMemoryMetrics() {
-        // ... (rest of your MemoryMetrics code - no changes needed)
         GlobalMemory memory = hardware.getMemory();
         long total = memory.getTotal();
         long available = memory.getAvailable();
@@ -112,7 +111,6 @@ public class SystemMonitorService {
     }
 
     public List<DiskMetrics> getDiskMetrics() {
-        // ... (rest of your DiskMetrics code - no changes needed)
         List<DiskMetrics> diskMetricsList = new ArrayList<>();
         FileSystem fileSystem = os.getFileSystem();
         List<OSFileStore> fileStores = fileSystem.getFileStores();
@@ -138,7 +136,6 @@ public class SystemMonitorService {
     }
 
     public NetworkMetrics getNetworkMetrics() {
-        // ... (rest of your NetworkMetrics code - no changes needed)
         NetworkMetrics networkMetrics = new NetworkMetrics();
         java.util.Map<String, NetworkInterfaceMetrics> interfaceMetricsMap = new java.util.HashMap<>();
 
@@ -154,7 +151,6 @@ public class SystemMonitorService {
     }
 
     private static NetworkInterfaceMetrics getNetworkInterfaceMetrics(oshi.hardware.NetworkIF networkIF) {
-        // ... (rest of your getNetworkInterfaceMetrics code - no changes needed)
         NetworkInterfaceMetrics interfaceMetrics = new NetworkInterfaceMetrics();
         interfaceMetrics.setName(networkIF.getName());
         interfaceMetrics.setDisplayName(networkIF.getDisplayName());

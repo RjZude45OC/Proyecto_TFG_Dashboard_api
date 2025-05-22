@@ -17,7 +17,7 @@ import org.slf4j.Logger;
 @ConditionalOnProperty(name = "metrics.scheduler.enabled", havingValue = "true", matchIfMissing = false)
 public class scheduler {
 
-    private static final Logger log = LoggerFactory.getLogger(scheduler.class);
+    static final Logger log = LoggerFactory.getLogger(scheduler.class);
     private final SystemMonitorService systemMonitorService;
 
     @Scheduled(fixedRateString = "${metrics.scheduler.interval:60000}")
