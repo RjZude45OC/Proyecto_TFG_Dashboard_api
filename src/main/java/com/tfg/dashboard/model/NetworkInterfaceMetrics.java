@@ -24,6 +24,7 @@ public class NetworkInterfaceMetrics {
     public void setBytesReceived(long bytesRecv) {
         this.bytesReceived = bytesRecv;
     }
+
     public void setPacketsSent(long packetsSent) {
         this.packetsSent = packetsSent;
     }
@@ -44,9 +45,8 @@ public class NetworkInterfaceMetrics {
         this.packetsReceived = packetsReceived;
     }
 
-    public String getName() {
-        return name;
-    }
+
+    public String getName() { return name; }
 
     public String getDisplayName() {
         return displayName;

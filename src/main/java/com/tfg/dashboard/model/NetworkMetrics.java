@@ -7,6 +7,16 @@ import java.util.Map;
 public class NetworkMetrics {
     private Map<String, NetworkInterfaceMetrics> interfaces;
 
+    public long getTimestamp() {
+        return timestamp;
+    }
+
+    public void setTimestamp(long timestamp) {
+        this.timestamp = timestamp;
+    }
+
+    private long timestamp;
+
     public void setInterfaces(Map<String, NetworkInterfaceMetrics> interfaceMetricsMap) {
         interfaces = interfaceMetricsMap;
     }

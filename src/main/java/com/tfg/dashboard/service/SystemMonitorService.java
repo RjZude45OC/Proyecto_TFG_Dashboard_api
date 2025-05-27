@@ -136,6 +136,7 @@ public class SystemMonitorService {
     }
 
     public NetworkMetrics getNetworkMetrics() {
+        long timestamp = System.currentTimeMillis();
         NetworkMetrics networkMetrics = new NetworkMetrics();
         java.util.Map<String, NetworkInterfaceMetrics> interfaceMetricsMap = new java.util.HashMap<>();
 
@@ -147,6 +148,7 @@ public class SystemMonitorService {
         }
 
         networkMetrics.setInterfaces(interfaceMetricsMap);
+        networkMetrics.setTimestamp(timestamp);
         return networkMetrics;
     }
 
