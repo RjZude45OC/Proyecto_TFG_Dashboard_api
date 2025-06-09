@@ -22,6 +22,8 @@ import java.util.Map;
 @RequiredArgsConstructor
 @Tag(name = "Health", description = "Health check")
 public class HealthController {
+    private final SystemMonitorService systemMonitorService;
+    private final DiscordWebhookService discordWebhookService;
 
     @GetMapping("")
     @Operation(summary = "Hello endpoint",
@@ -29,9 +31,6 @@ public class HealthController {
     public String helloworld() {
         return "hello";
     }
-
-    private final SystemMonitorService systemMonitorService;
-    private final DiscordWebhookService discordWebhookService;
 
     @GetMapping("/test")
     @Operation(summary = "Test Discord webhook",

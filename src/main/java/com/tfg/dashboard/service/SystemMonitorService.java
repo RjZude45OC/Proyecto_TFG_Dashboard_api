@@ -17,7 +17,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;import static com.tfg.dashboard.service.scheduler.log;
+import java.util.concurrent.locks.ReentrantLock;
+import static com.tfg.dashboard.service.scheduler.log;
 
 @Service
 @Slf4j
