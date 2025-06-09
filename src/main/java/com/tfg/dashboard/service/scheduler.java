@@ -19,6 +19,7 @@ public class scheduler {
 
     static final Logger log = LoggerFactory.getLogger(scheduler.class);
     private final SystemMonitorService systemMonitorService;
+    private final DiscordWebhookService discordWebhookService;
 
     @Scheduled(fixedRateString = "${metrics.scheduler.interval:60000}")
     public void logSystemMetrics() {
@@ -28,6 +29,8 @@ public class scheduler {
             log.info("Memory usage: {}%", String.format("%.2f", metrics.getMemory().getMemoryUsagePercentage()));
             metrics.getDisks().forEach(disk ->
                     log.info("Disk {} usage: {}%", disk.getName(), String.format("%.2f", disk.getUsagePercentage())));
+
+            discordWebhookService.sendMetricsToDiscord(metrics);
         }
     }
 }
